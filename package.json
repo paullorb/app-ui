@@ -1,0 +1,23 @@
+{
+  "name": "@paullorb/app-ui",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Shared source-only design tokens and UI primitives for PaulOps apps",
+  "files": [
+    "styles"
+  ],
+  "exports": {
+    "./styles.css": "./styles/index.css",
+    "./tokens.css": "./styles/tokens.css",
+    "./base.css": "./styles/base.css",
+    "./primitives.css": "./styles/primitives.css"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "lint": "npm run check",
+    "build": "npm run check"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}

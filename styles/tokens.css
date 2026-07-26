@@ -1,0 +1,76 @@
+:root {
+  --background: #28282d;
+  --foreground: #f3f4f5;
+  --surface-rgb: 56 62 66;
+  --surface-raise-rgb: 255 255 255;
+  --surface: rgb(var(--surface-rgb));
+  --glass: rgb(var(--surface-rgb) / 0.5);
+  --glass-strong: rgb(var(--surface-rgb) / 0.78);
+  --glass-border: rgb(255 255 255 / 0.12);
+  --ink-muted: #a7adb3;
+  --ink-soft: rgb(var(--surface-raise-rgb) / 0.78);
+  --brand-ink: var(--foreground);
+  --accent: #f28705;
+  --accent-rgb: 242 135 5;
+  --accent-contrast: #20170a;
+  --danger: #ff8f80;
+  --danger-rgb: 255 143 128;
+  --danger-strong: #c14b3a;
+  --success: #74cad8;
+  --warning: #e6b95a;
+  --link: #8bd5ef;
+  --surface-soft: rgb(var(--surface-rgb) / 0.42);
+  --surface-muted: rgb(var(--surface-rgb) / 0.36);
+  --surface-subtle: rgb(var(--surface-raise-rgb) / 0.1);
+  --field-border: rgb(255 255 255 / 0.16);
+  --field-shadow: inset 0 1px 1px rgb(255 255 255 / 0.62);
+  --field-focus-background: rgb(var(--surface-rgb) / 0.72);
+  --field-focus-border: rgb(255 255 255 / 0.44);
+  --focus-ring: 0 0 0 4px rgb(var(--accent-rgb) / 0.4);
+  --focus-ring-soft: 0 0 0 3px rgb(var(--accent-rgb) / 0.24);
+  --shadow-soft:
+    0 10px 26px rgb(0 0 0 / 0.28),
+    inset 0 1px 0 rgb(255 255 255 / 0.42);
+  --radius-control: 8px;
+  --radius-pill: 999px;
+  --control-height: 52px;
+  --compact-control-height: 40px;
+  --touch-target: 44px;
+  --portal-background:
+    radial-gradient(circle at 16% 8%, rgb(37 150 190 / 0.16), transparent 26rem),
+    radial-gradient(circle at 90% 18%, rgb(var(--accent-rgb) / 0.12), transparent 25rem),
+    linear-gradient(150deg, #28282d 0%, #2f3034 46%, #25262b 100%);
+  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 18px;
+  --space-lg: 24px;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --background: #f3f4f5;
+  --foreground: #20242a;
+  --surface-rgb: 255 255 255;
+  --surface-raise-rgb: 20 24 30;
+  --glass: rgb(255 255 255 / 0.62);
+  --glass-strong: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(20 24 30 / 0.12);
+  --field-border: rgb(20 24 30 / 0.16);
+  --field-shadow: inset 0 1px 1px rgb(20 24 30 / 0.04);
+  --field-focus-border: rgb(20 24 30 / 0.44);
+  --ink-muted: #5b626c;
+  --danger: #9e2f24;
+  --success: #14606a;
+  --link: #075d77;
+  --portal-background:
+    radial-gradient(circle at 16% 8%, rgb(37 150 190 / 0.12), transparent 26rem),
+    radial-gradient(circle at 90% 18%, rgb(var(--accent-rgb) / 0.1), transparent 25rem),
+    linear-gradient(150deg, #f5f6f8 0%, #eceef1 46%, #e6e8ec 100%);
+  --shadow-soft:
+    0 10px 24px rgb(20 24 30 / 0.14),
+    inset 0 1px 0 rgb(255 255 255 / 0.72);
+  color-scheme: light;
+}
