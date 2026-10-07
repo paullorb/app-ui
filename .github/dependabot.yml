@@ -1,0 +1,27 @@
+version: 2
+
+# Actions only, on purpose. package.json here declares no dependencies and no
+# devDependencies — the shared UI boundary is source, not a package with a tree
+# — so an npm entry would have nothing to propose and would only add a weekly
+# job that finds nothing.
+#
+# ci.yml's actions ARE pinned by full commit SHA, which means nothing moves them
+# unless something does it deliberately. Nothing did: there was no
+# dependabot.yml here. This repo is quiet (one pull request in two months),
+# which makes it exactly the kind of place where a pin ages unnoticed for a
+# year.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # An action runs with the job's own reach, so a freshly published SHA is not
+    # something to adopt within hours of publish.
+    cooldown:
+      default-days: 3
+      semver-major-days: 7
+    groups:
+      actions:
+        patterns:
+          - "*"
