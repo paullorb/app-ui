@@ -3,8 +3,10 @@ name: CI
 on:
   push:
     branches: [main]
+  # Every pull request, not only the ones based on main: a PR stacked on
+  # another PR's branch gets the same checks, which is what the up-to-date
+  # rule on main relies on.
   pull_request:
-    branches: [main]
 
 permissions:
   contents: read

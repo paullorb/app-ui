@@ -1,0 +1,32 @@
+name: PR overlap
+
+# Comments on a pull request with the other open pull requests that change the
+# same files, so whoever merges second knows what is in flight. The reasoning
+# and the incidents behind it are in the reusable workflow in paullorb/cicd.
+#
+# Informational on purpose: it never blocks a merge, so it is not one of the
+# checks the "main protection" ruleset requires. The enforcement half of the
+# same problem is that ruleset's up-to-date requirement.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  # Only the newest push's answer is worth having: an overlap computed against
+  # a head that has been replaced is wrong, not merely old.
+  group: pr-overlap-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  overlap:
+    uses: paullorb/cicd/.github/workflows/pr-overlap.yml@7a1a7f483700ababb5b75e3138897a3ea8163c2c
+    with:
+      ignore: |
+        package-lock.json
+    permissions:
+      contents: read
+      pull-requests: write
