@@ -1,1 +1,8 @@
 node_modules/
+
+# Claude Code worktrees, scratch and runtime state. A worktree under .claude/
+# otherwise shows up as untracked in the main checkout, where `git add -A`
+# would take it. The shared settings stay tracked.
+.claude/*
+!.claude/settings.json
+!.claude/launch.json
