@@ -25,3 +25,9 @@ updates:
       actions:
         patterns:
           - "*"
+    # pr-overlap.yml's pin lives in paullorb/cicd, which Dependabot cannot read
+    # from a private repository: proposing it fails the whole weekly actions
+    # update with git_dependencies_not_reachable (careteam hit this). That pin
+    # is bumped by hand when cicd changes.
+    ignore:
+      - dependency-name: "paullorb/cicd"
