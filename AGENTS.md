@@ -23,7 +23,10 @@ Product branding and feature styles stay in each application.
 - **Work in a worktree, never the primary checkout**
   (`.claude/hooks/primary-checkout-guard.sh` refuses the edit). The session
   starts by listing the repo's red PRs (`.claude/hooks/red-prs.sh`); your own
-  red PR comes before new work.
+  red PR comes before new work. A push to a branch whose PR has already merged
+  is refused as well (`.claude/hooks/merged-branch-push-guard.sh`): auto-merge
+  squashed it and GitHub deleted the branch, so the commit would land where
+  nothing reviews or merges it. Cut a new branch off `origin/main`.
 - **Report the verdict, not the mechanics**: "CI passed" is the whole report.
   Wait for an outcome once, do not poll for it.
 - **Every change goes through a PR into `main` with auto-merge armed**; never
