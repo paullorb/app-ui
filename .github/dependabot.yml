@@ -32,6 +32,9 @@ updates:
     # is bumped by hand when cicd changes.
     # Dependabot names a reusable workflow by its full path
     # (paullorb/cicd/.github/workflows/<file>.yml), so a bare
-    # "paullorb/cicd" matches nothing; the wildcard covers every one.
+    # "paullorb/cicd" may match nothing; the wildcard covers every one. The
+    # bare name stays too, as muk keeps it, in case Dependabot names the
+    # dependency by repository instead.
     ignore:
       - dependency-name: "paullorb/cicd/*"
+      - dependency-name: "paullorb/cicd"
