@@ -10,6 +10,10 @@ version: 2
 # dependabot.yml here. This repo is quiet (one pull request in two months),
 # which makes it exactly the kind of place where a pin ages unnoticed for a
 # year.
+#
+# No reusable workflow from paullorb/cicd here, and none is coming: app-ui is
+# public and cicd's reusable workflows are private, so GitHub will not let a
+# public repository call them — there is no such pin for Dependabot to ignore.
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -26,15 +30,3 @@ updates:
       actions:
         patterns:
           - "*"
-    # pr-overlap.yml's pin lives in paullorb/cicd, which Dependabot cannot read
-    # from a private repository: proposing it fails the whole weekly actions
-    # update with git_dependencies_not_reachable (careteam hit this). That pin
-    # is bumped by hand when cicd changes.
-    # Dependabot names a reusable workflow by its full path
-    # (paullorb/cicd/.github/workflows/<file>.yml), so a bare
-    # "paullorb/cicd" may match nothing; the wildcard covers every one. The
-    # bare name stays too, as muk keeps it, in case Dependabot names the
-    # dependency by repository instead.
-    ignore:
-      - dependency-name: "paullorb/cicd/*"
-      - dependency-name: "paullorb/cicd"
