@@ -18,9 +18,10 @@ updates:
       day: monday
     # An action runs with the job's own reach, so a freshly published SHA is not
     # something to adopt within hours of publish.
+    # default-days only: GitHub Actions does not support the semver-*-days
+    # cooldowns, and Dependabot rejects the whole file if one is set here.
     cooldown:
       default-days: 3
-      semver-major-days: 7
     groups:
       actions:
         patterns:
@@ -29,5 +30,8 @@ updates:
     # from a private repository: proposing it fails the whole weekly actions
     # update with git_dependencies_not_reachable (careteam hit this). That pin
     # is bumped by hand when cicd changes.
+    # Dependabot names a reusable workflow by its full path
+    # (paullorb/cicd/.github/workflows/<file>.yml), so a bare
+    # "paullorb/cicd" matches nothing; the wildcard covers every one.
     ignore:
-      - dependency-name: "paullorb/cicd"
+      - dependency-name: "paullorb/cicd/*"

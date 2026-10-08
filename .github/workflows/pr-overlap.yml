@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   overlap:
-    uses: paullorb/cicd/.github/workflows/pr-overlap.yml@4b04c34cad4475e4fa2bb72b97ce799e2af077fb
+    uses: paullorb/cicd/.github/workflows/pr-overlap.yml@6cfaf59c520b1491044c5dd2d07cfd32d8a9a706
     with:
       ignore: |
         package-lock.json
