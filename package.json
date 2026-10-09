@@ -13,11 +13,14 @@
     "./primitives.css": "./styles/primitives.css"
   },
   "scripts": {
-    "check": "node scripts/check.mjs",
-    "lint": "npm run check",
+    "check": "npm run lint && node scripts/check.mjs",
+    "lint": "oxlint --deny-warnings --report-unused-disable-directives",
     "build": "npm run check"
   },
   "engines": {
     "node": "24.x"
+  },
+  "devDependencies": {
+    "oxlint": "^1.87.0"
   }
 }
