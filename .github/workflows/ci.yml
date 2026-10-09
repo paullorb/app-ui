@@ -8,6 +8,11 @@ on:
   # rule on main relies on.
   pull_request:
 
+# A superseded push to a PR branch cancels its stale run; main never cancels.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 permissions:
   contents: read
 
@@ -21,6 +26,9 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
+          # package-lock.json lives at the repo root; cache npm's download
+          # between runs instead of refetching every dependency each time.
+          cache: npm
 
       - run: npm ci
       - run: npm run check
