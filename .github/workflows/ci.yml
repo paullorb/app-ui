@@ -8,9 +8,11 @@ on:
   # rule on main relies on.
   pull_request:
 
-# A superseded push to a PR branch cancels its stale run; main never cancels.
 concurrency:
-  group: ci-${{ github.ref }}
+  # One run per pull-request branch, newest wins. On main every commit gets its
+  # own group: a shared group holds only one pending run, so a third push
+  # would cancel the second commit's run before it ever started.
+  group: ci-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 permissions:
