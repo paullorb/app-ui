@@ -31,3 +31,9 @@ Product branding and feature styles stay in each application.
   Wait for an outcome once, do not poll for it.
 - **Every change goes through a PR into `main` with auto-merge armed**; never
   merge by hand.
+- **Hand Paul his tasks as issues, not prose.** When something only Paul can
+  do — a secret to set, a LaunchAgent to install, a decision to take — open
+  an issue in the repo concerned, label it `for-paul`, and put the exact
+  commands or the question in the body. It shows up in the Tasks component
+  on status.paullorber.com until he closes it; a sentence at the end of a
+  chat thread does not.
