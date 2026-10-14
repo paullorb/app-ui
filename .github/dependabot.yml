@@ -1,9 +1,11 @@
 version: 2
 
-# Actions only, on purpose. package.json here declares no dependencies and no
-# devDependencies — the shared UI boundary is source, not a package with a tree
-# — so an npm entry would have nothing to propose and would only add a weekly
-# job that finds nothing.
+# Two ecosystems: npm for the one devDependency (oxlint, which gates every pull
+# request through `npm run check`), and github-actions for the pinned actions.
+# package.json declares no runtime dependencies — the shared UI boundary is
+# source, not a package with a tree — so the npm entry only ever proposes
+# oxlint and its lockfile entries. CI installs the exact lockfile version, so
+# without this entry a lint fix or security advisory would never be proposed.
 #
 # ci.yml's actions ARE pinned by full commit SHA, which means nothing moves them
 # unless something does it deliberately. Nothing did: there was no
@@ -15,6 +17,18 @@ version: 2
 # public and cicd's reusable workflows are private, so GitHub will not let a
 # public repository call them — there is no such pin for Dependabot to ignore.
 updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Same default-days cooldown as the actions below.
+    cooldown:
+      default-days: 3
+    groups:
+      npm:
+        patterns:
+          - "*"
   - package-ecosystem: github-actions
     directory: /
     schedule:
