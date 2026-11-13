@@ -1,0 +1,150 @@
+name: PR overlap
+
+# Comments on a pull request with the other open pull requests that change the
+# same files, so whoever merges second knows what is in flight. This public
+# repository keeps the workflow local because it cannot call reusable workflows
+# in private paullorb/cicd. Informational only: errors never block a merge.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: pr-overlap-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  overlap:
+    name: What else is in flight on these files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Find and report the overlap
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          READ_ONLY: >-
+            ${{ github.event_name == 'pull_request' && (
+              github.event.pull_request.head.repo.full_name != github.repository
+              || github.actor == 'dependabot[bot]') }}
+          CLOSED: ${{ github.event.action == 'closed' }}
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          if [ "$READ_ONLY" = "true" ]; then
+            echo "::notice::This run's token is read-only, so no overlap comment is written."
+            exit 0
+          fi
+
+          export MARKER="<!-- cicd pr-overlap -->"
+          files_dir="$RUNNER_TEMP/files"
+          mkdir -p "$files_dir"
+
+          files_of() {
+            local file="$files_dir/$1"
+            if [ ! -e "$file" ]; then
+              gh api --paginate "repos/$GH_REPO/pulls/$1/files" --jq '.[].filename' \
+                | sort -u | awk '$0 != "package-lock.json"' > "$file" || : > "$file"
+            fi
+            cat "$file"
+          }
+
+          open_file="$RUNNER_TEMP/open.tsv"
+          gh api --paginate "repos/$GH_REPO/pulls?state=open&base=$BASE&per_page=100" \
+            --jq '.[] | select(.draft == false) | "\(.number)\t\(.title)"' > "$open_file" \
+            || : > "$open_file"
+
+          report() {
+            local number="$1" body="$RUNNER_TEMP/body-$1.md" header="$RUNNER_TEMP/header-$1.md"
+            local found=0 other title shared mine existing plural
+            : > "$body"
+            mine="$(files_of "$number")"
+            if [ -n "$mine" ]; then
+              while IFS=$'\t' read -r other title; do
+                if [ -z "$other" ] || [ "$other" = "$number" ]; then continue; fi
+                shared="$(comm -12 <(printf '%s\n' "$mine") <(files_of "$other"))"
+                [ -z "$shared" ] && continue
+                found=$((found + 1))
+                {
+                  echo "#### #$other — $title"
+                  echo
+                  printf '%s\n' "$shared" | sed 's/^/- `/; s/$/`/'
+                  echo
+                } >> "$body"
+              done < "$open_file"
+            fi
+
+            existing=""
+            for id in $(gh api --paginate "repos/$GH_REPO/issues/$number/comments" \
+              --jq '.[] | select(.body | contains(env.MARKER)) | .id'); do
+              if [ -z "$existing" ]; then
+                existing="$id"
+              else
+                gh api -X DELETE "repos/$GH_REPO/issues/comments/$id" >/dev/null \
+                  || echo "::warning::Could not delete a duplicate overlap comment on #$number."
+              fi
+            done
+
+            if [ "$found" -eq 0 ]; then
+              if [ "$number" = "$PR" ]; then
+                echo "No other open pull request into $BASE changes these files." >> "$GITHUB_STEP_SUMMARY"
+              fi
+              if [ -n "$existing" ]; then
+                printf '%s\n\n**No longer overlapping.** No other open pull request into `%s` changes a file this one changes.\n' \
+                  "$MARKER" "$BASE" > "$body"
+                gh api -X PATCH "repos/$GH_REPO/issues/comments/$existing" \
+                  -F "body=@$body" >/dev/null \
+                  || echo "::warning::Could not clear the overlap comment on #$number."
+              fi
+              return 0
+            fi
+
+            plural="pull requests"
+            [ "$found" -eq 1 ] && plural="pull request"
+            {
+              echo "$MARKER"
+              echo
+              echo "### $found other open $plural change files this one changes"
+              echo
+              echo "Each can be green alone and still break \`$BASE\` together with this one. Whichever merges second should be brought up to \`$BASE\` and re-checked."
+              echo
+              cat "$body"
+              echo "<sub>Rewritten by \`pr-overlap.yml\` whenever a pull request opens, pushes or closes. Informational — it never blocks a merge.</sub>"
+            } > "$header"
+
+            if [ "$number" = "$PR" ]; then
+              cat "$header" >> "$GITHUB_STEP_SUMMARY"
+              echo "::notice::$found other open $plural change files this one changes."
+            fi
+
+            if [ -n "$existing" ]; then
+              gh api -X PATCH "repos/$GH_REPO/issues/comments/$existing" -F "body=@$header" >/dev/null \
+                || echo "::warning::Could not update the overlap comment on #$number."
+            else
+              gh api -X POST "repos/$GH_REPO/issues/$number/comments" -F "body=@$header" >/dev/null \
+                || echo "::warning::Could not post the overlap comment on #$number."
+            fi
+          }
+
+          if [ "$CLOSED" != "true" ]; then
+            report "$PR"
+          fi
+
+          export NAMED="#### #$PR —"
+          names_me() {
+            [ -n "$(gh api --paginate "repos/$GH_REPO/issues/$1/comments" \
+              --jq '.[] | select(.body | contains(env.MARKER)) | select(.body | contains(env.NAMED)) | .id' | head -1)" ]
+          }
+          mine="$(files_of "$PR")"
+          while IFS=$'\t' read -r other _; do
+            if [ -z "$other" ] || [ "$other" = "$PR" ]; then continue; fi
+            shared="$(comm -12 <(printf '%s\n' "$mine") <(files_of "$other"))"
+            if [ -z "$shared" ] && ! names_me "$other"; then continue; fi
+            report "$other"
+          done < "$open_file"
