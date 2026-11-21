@@ -30,10 +30,15 @@ Product branding and feature styles stay in each application.
 - **Report the verdict, not the mechanics**: "CI passed" is the whole report.
   Wait for an outcome once, do not poll for it.
 - **Every change goes through a PR into `main` with auto-merge armed**; never
-  merge by hand.
+  merge by hand. `.github/workflows/auto-merge.yml` arms it when the PR opens,
+  GitHub deletes the branch on merge, and the nightly sweep removes the local
+  branch and its worktree once the work is proven merged.
 - **Hand Paul his tasks as issues, not prose.** When something only Paul can
   do — a secret to set, a LaunchAgent to install, a decision to take — open
   an issue in the repo concerned, label it `for-paul`, and put the exact
-  commands or the question in the body. It shows up in the Tasks component
-  on status.paullorber.com until he closes it; a sentence at the end of a
-  chat thread does not.
+  commands or the question in the body. It shows up in the Tasks component on
+  status.paullorber.com until he closes it; a sentence at the end of a chat
+  thread does not. When it waits on a client instead (their credentials,
+  their decision, a record only they hold), label it `for-client`: it shows
+  under "Waiting on clients" in the same panel, and stays out of Paul's own
+  list.

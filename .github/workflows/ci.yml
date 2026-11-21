@@ -19,22 +19,12 @@ permissions:
   contents: read
 
 jobs:
-  # This public repository cannot call reusable workflows in private
-  # paullorb/cicd. Keep the equivalent lint, audit and build pipeline local,
-  # and retain the job name required by the main branch ruleset.
-  check:
-    name: check
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-
-      - run: npm ci
-      - run: npm audit --omit=dev --audit-level=high
-      - run: npm run lint
-      - run: npm run build
+  pipeline:
+    name: CI
+    # Reusable pipeline shared across paullorb repos: lint, audit and build
+    # (the migration replay is a no-op here, there is no supabase directory).
+    # paullorb/cicd is public now, so this public repository can call it like
+    # every other one. No secrets. CI_LABELS routes it to a hosted runner.
+    uses: paullorb/cicd/.github/workflows/app-ci.yml@f3accf1d4299ed5692924b24bb7bd6d2d8dd9f16
+    with:
+      node_version_file: .nvmrc
